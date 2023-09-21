@@ -95,5 +95,5 @@ void read_lexem(Lexem *lexem, FILE *file)
 	KEYWORD(OR)
 	KEYWORD(AND)
 	lexem -> type = IDENTIFIER;
-	strcpy(symbol, lexem->idendifier_name);
+	strcpy(lexem->identifier_name, symbol);
 }

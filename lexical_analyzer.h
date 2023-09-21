@@ -22,7 +22,13 @@ typedef enum
 	ASSIGNMENT,
 	OPEN_BRACKET,
 	CLOSE_BRACKET,
-	EOF_LEXEM
+	EOF_LEXEM,
+	IF,
+	THEN,
+	ELSE,
+	END_IF,
+	READ,
+	WRITE
 } Lexem_type;
 
 typedef struct {

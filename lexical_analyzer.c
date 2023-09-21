@@ -94,6 +94,12 @@ void read_lexem(Lexem *lexem, FILE *file)
 	KEYWORD(NOT)
 	KEYWORD(OR)
 	KEYWORD(AND)
+	KEYWORD(READ)
+	KEYWORD(WRITE)
+	KEYWORD(IF)
+	KEYWORD(ELSE)
+	KEYWORD(THEN)
+	KEYWORD(END_IF)
 	lexem -> type = IDENTIFIER;
 	strcpy(lexem->identifier_name, symbol);
 }

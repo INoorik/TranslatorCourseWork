@@ -21,14 +21,15 @@ typedef enum
 	SEMICOLON,
 	ASSIGNMENT,
 	OPEN_BRACKET,
-	CLOSE_BRACKET
+	CLOSE_BRACKET,
+	EOF_LEXEM
 } Lexem_type;
 
 typedef struct {
 	Lexem_type type;
-	char identifier_name[MAX_IDENTIFIER_LENGTH];
+	char identifier_name[MAX_IDENTIFIER_LENGTH + 1];
 } Lexem;
 
-void read_lexem(Lexem *lexem);
+void read_lexem(Lexem *lexem, FILE *file);
 
 #endif

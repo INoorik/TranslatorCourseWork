@@ -6,6 +6,7 @@
 #include "lexical_analyzer.h"
 
 #define KEYWORD(word) if(strcmp(symbol, #word) == 0){ lexem->type = word; return; }
+#define ONE_SYMBOL_LEXEM(ch, lexem_name) if(c==ch) { lexem->type = lexem_name; return; }
 
 int is_space(char c)
 {
@@ -20,51 +21,15 @@ void read_lexem(Lexem *lexem, FILE *file)
 	while(is_space(c))
 		c = getc(file);
 
-	if(c==-1)
-	{
-		lexem -> type = EOF_LEXEM;
-		return;
-	}
-	if(c=='(')
-	{
-		lexem -> type = OPEN_BRACKET;
-		return;
-	}
-	if(c==')')
-	{
-		lexem -> type = CLOSE_BRACKET;
-		return;
-	}
-	if(c=='0')
-	{
-		lexem -> type = ZERO_CONSTANT;
-		return;
-	}
-	if(c=='1')
-	{
-		lexem -> type = ONE_CONSTANT;
-		return;
-	}
-	if(c==',')
-	{
-		lexem -> type = COMMA;
-		return;
-	}
-	if(c==':')
-	{
-		lexem -> type = COLON;
-		return;
-	}
-	if(c==';')
-	{
-		lexem -> type = SEMICOLON;
-		return;
-	}
-	if(c=='=')
-	{
-		lexem -> type = ASSIGNMENT;
-		return;
-	}
+	ONE_SYMBOL_LEXEM(-1, EOF_LEXEM);
+	ONE_SYMBOL_LEXEM('(', OPEN_BRACKET)
+	ONE_SYMBOL_LEXEM(')', CLOSE_BRACKET);
+	ONE_SYMBOL_LEXEM('0', ZERO_CONSTANT);
+	ONE_SYMBOL_LEXEM('1', ONE_CONSTANT);
+	ONE_SYMBOL_LEXEM(',', COMMA);
+	ONE_SYMBOL_LEXEM(':', COLON);
+	ONE_SYMBOL_LEXEM(';', SEMICOLON);
+	ONE_SYMBOL_LEXEM('=', ASSIGNMENT);
 	char symbol[MAX_IDENTIFIER_LENGTH + 1];
 	symbol[0] = c;
 	if(!isalpha(c))
@@ -87,19 +52,19 @@ void read_lexem(Lexem *lexem, FILE *file)
 	}
 	ungetc(c, file);
 	symbol[i] = '\0';
-	KEYWORD(BEGIN)
-	KEYWORD(END)
-	KEYWORD(VAR)
-	KEYWORD(LOGICAL)
-	KEYWORD(NOT)
-	KEYWORD(OR)
-	KEYWORD(AND)
-	KEYWORD(READ)
-	KEYWORD(WRITE)
-	KEYWORD(IF)
-	KEYWORD(ELSE)
-	KEYWORD(THEN)
-	KEYWORD(END_IF)
+	KEYWORD(BEGIN);
+	KEYWORD(END);
+	KEYWORD(VAR);
+	KEYWORD(LOGICAL);
+	KEYWORD(NOT);
+	KEYWORD(OR);
+	KEYWORD(AND);
+	KEYWORD(READ);
+	KEYWORD(WRITE);
+	KEYWORD(IF);
+	KEYWORD(ELSE);
+	KEYWORD(THEN);
+	KEYWORD(END_IF);
 	for(char *ptr = symbol; *ptr; ptr++)
 	{
 		if(*ptr == '_')

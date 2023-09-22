@@ -74,7 +74,7 @@ void read_lexem(Lexem *lexem, FILE *file)
 	}
 	int i = 1;
 	c = getc(file);
-	while(isalpha(c) && i<MAX_IDENTIFIER_LENGTH)
+	while(isalpha(c) || c=='_' && i<MAX_IDENTIFIER_LENGTH)
 	{
 		symbol[i] = c;
 		++i;
@@ -100,6 +100,14 @@ void read_lexem(Lexem *lexem, FILE *file)
 	KEYWORD(ELSE)
 	KEYWORD(THEN)
 	KEYWORD(END_IF)
+	for(char *ptr = symbol; *ptr; ptr++)
+	{
+		if(*ptr == '_')
+		{
+			printf("Invalid character: _\n");
+			exit(1);
+		}
+	}
 	lexem -> type = IDENTIFIER;
 	strcpy(lexem->identifier_name, symbol);
 }

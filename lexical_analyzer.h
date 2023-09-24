@@ -1,6 +1,8 @@
 #ifndef LEXICAL_ANALYZER
 #define LEXICAL_ANALYZER
 
+#include <stdio.h>
+
 #define MAX_IDENTIFIER_LENGTH 11
 
 typedef enum 

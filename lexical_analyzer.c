@@ -39,19 +39,19 @@ void read_lexem(Lexem *lexem, FILE *file)
 	}
 	int i = 1;
 	c = getc(file);
-	while(isalpha(c) || c=='_' && i<MAX_IDENTIFIER_LENGTH)
+	while((isalpha(c) || c=='_' )&& i<MAX_IDENTIFIER_LENGTH)
 	{
 		symbol[i] = c;
 		++i;
 		c = getc(file);
 	}
+	symbol[i] = '\0';
 	if(i==MAX_IDENTIFIER_LENGTH)
 	{
 		printf("Too long identifier: %s\n", symbol);
 		exit(1);
 	}
 	ungetc(c, file);
-	symbol[i] = '\0';
 	KEYWORD(BEGIN);
 	KEYWORD(END);
 	KEYWORD(VAR);

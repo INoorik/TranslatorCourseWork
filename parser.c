@@ -1,7 +1,7 @@
 #include <stdlib.h>
 
 #include "parser.h"
-#incldue "grammer.h"
+#include "grammar.h"
 
 const size_t RULES_CNT =  sizeof(grammar) / sizeof(grammar[0]);
 
@@ -124,11 +124,36 @@ Parsing_tree_node *parse(FILE *file)
 				exit(1);
 			}
 		}else{
-			// TODO
 			for(int i = 0; i<RULES_CNT; ++i)
 			{
-
+				if(grammar[i].left_part != top)
+					continue;
+				if(grammar[i].first_lexem_of_right_part == -1)
+				{
+					int idx = get_first_none_idx(current);
+					current -> childs_types[idx] = NON_TERMINAL;
+					current -> childs[idx] = new_parsing_tree_node(grammar[i].left_part, current);
+					current = current -> childs[idx];
+					break;
+				}
+				if(grammar[i].first_lexem_of_right_part != lexem.type)
+					continue;
+				push_symbol_to_stack(stack, -1);
+				for(int s = 0; grammar[i].right_part[s] != -1; ++s)
+				{
+					push_symbol_to_stack(stack, grammar[i].right_part[s]);
+				}
+				int idx = get_first_none_idx(current);
+				current -> childs_types[idx] = NON_TERMINAL;
+				current -> childs[idx] = new_parsing_tree_node(grammar[i].left_part, current);
+				current = current -> childs[idx];
+				current -> childs_types[0] = TERMINAL;
+				current -> childs[0] = malloc(sizeof(Lexem));
+				*(Lexem*)(current -> childs[0]) = lexem;
+				break;
 			}
+			printf("Unexpected lexem%d\n", lexem.type);
+			exit(1);
 		}
 	}
 		

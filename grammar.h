@@ -1,14 +1,17 @@
 #include "grammatic_rule.h"
 
+#define NON_TERMINAL_ENTRY(s) s*2 + 1
+#define TERMINAL_ENTRY(s) s*2 
+
 Grammatic_rule grammar[] = {
-	{VARS_LIST, IDENTIFIER, {non_terminal2united_dict_symbol(VARS_LIST_C), -1}},
-	{VARS_LIST_C, COMMA, {non_terminal2united_dict_symbol(VARS_LIST), -1}},
+	{VARS_LIST, IDENTIFIER, {NON_TERMINAL_ENTRY(VARS_LIST_C), -1}},
+	{VARS_LIST_C, COMMA, {NON_TERMINAL_ENTRY(VARS_LIST), -1}},
 	{VARS_LIST_C, -1, {}},
 	{ASSIGNMENTS_LIST, IDENTIFIER, {
-					       lexem2united_dict_symbol(SEMICOLON), 
-					       non_terminal2united_dict_symbol(EXPRESSION),
-					       lexem2united_dict_symbol(ASSIGNMENT),
+					       TERMINAL_ENTRY(SEMICOLON), 
+					       NON_TERMINAL_ENTRY(EXPRESSION),
+					       TERMINAL_ENTRY(ASSIGNMENT),
 					       -1
 				       }},
 	// to be continued ... 
-}
+};

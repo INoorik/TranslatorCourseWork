@@ -103,17 +103,18 @@ Parsing_tree_node *parse(FILE *file)
 		if(symbol_stack_top(stack) == -1)
 		{
 			current = current->parent;
-			pop_symbol_from_stack(stack);
+			stack = pop_symbol_from_stack(stack);
 			continue;
 		}
 
 		United_dict_symbol top = symbol_stack_top(stack);
 
+		int success = 0;
 		if(get_symbol_type(top) == TERMINAL)
 		{
 			if(lexem2united_dict_symbol(lexem.type)==top)
 			{
-				pop_symbol_from_stack(stack);
+				stack = pop_symbol_from_stack(stack);
 				int idx = get_first_none_idx(current);
 				current -> childs_types[idx] = TERMINAL;
 				current -> childs[idx] = malloc(sizeof(Lexem));
@@ -126,7 +127,7 @@ Parsing_tree_node *parse(FILE *file)
 		}else{
 			for(int i = 0; i<RULES_CNT; ++i)
 			{
-				if(grammar[i].left_part != top)
+				if(non_terminal2united_dict_symbol(grammar[i].left_part) != top)
 					continue;
 				if(grammar[i].first_lexem_of_right_part == -1)
 				{
@@ -134,14 +135,17 @@ Parsing_tree_node *parse(FILE *file)
 					current -> childs_types[idx] = NON_TERMINAL;
 					current -> childs[idx] = new_parsing_tree_node(grammar[i].left_part, current);
 					current = current -> childs[idx];
+					stack = pop_symbol_from_stack(stack);
+					success = 1;
 					break;
 				}
 				if(grammar[i].first_lexem_of_right_part != lexem.type)
 					continue;
-				push_symbol_to_stack(stack, -1);
+				stack = pop_symbol_from_stack(stack);
+				stack = push_symbol_to_stack(stack, -1);
 				for(int s = 0; grammar[i].right_part[s] != -1; ++s)
 				{
-					push_symbol_to_stack(stack, grammar[i].right_part[s]);
+					stack = push_symbol_to_stack(stack, grammar[i].right_part[s]);
 				}
 				int idx = get_first_none_idx(current);
 				current -> childs_types[idx] = NON_TERMINAL;
@@ -150,8 +154,12 @@ Parsing_tree_node *parse(FILE *file)
 				current -> childs_types[0] = TERMINAL;
 				current -> childs[0] = malloc(sizeof(Lexem));
 				*(Lexem*)(current -> childs[0]) = lexem;
+				read_lexem(&lexem, file);
+				success = 1;
 				break;
 			}
+			if(success)
+				continue;
 			printf("Unexpected lexem%d\n", lexem.type);
 			exit(1);
 		}

@@ -8,10 +8,12 @@ Grammatic_rule grammar[] = {
 	{VARS_LIST_C, COMMA, {NON_TERMINAL_ENTRY(VARS_LIST), -1}},
 	{VARS_LIST_C, -1, {}},
 	{ASSIGNMENTS_LIST, IDENTIFIER, {
+					       NON_TERMINAL_ENTRY(ASSIGNMENTS_LIST),
 					       TERMINAL_ENTRY(SEMICOLON), 
 					       NON_TERMINAL_ENTRY(EXPRESSION),
 					       TERMINAL_ENTRY(ASSIGNMENT),
 					       -1
 				       }},
+	{ASSIGNMENTS_LIST, -1, {}}
 	// to be continued ... 
 };

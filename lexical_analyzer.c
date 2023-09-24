@@ -65,6 +65,7 @@ void read_lexem(Lexem *lexem, FILE *file)
 	KEYWORD(ELSE);
 	KEYWORD(THEN);
 	KEYWORD(END_IF);
+	KEYWORD(EQU);
 	for(char *ptr = symbol; *ptr; ptr++)
 	{
 		if(*ptr == '_')

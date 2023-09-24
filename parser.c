@@ -2,6 +2,7 @@
 
 #include "parser.h"
 #include "grammar.h"
+#include "lexem_to_a.h"
 
 const size_t RULES_CNT =  sizeof(grammar) / sizeof(grammar[0]);
 
@@ -121,7 +122,7 @@ Parsing_tree_node *parse(FILE *file)
 				*(Lexem*)(current -> childs[idx]) = lexem;
 				read_lexem(&lexem, file);
 			}else{
-				printf("Expected lexem%d, got lexem%d\n", top/2, lexem.type);
+				printf("Expected %s, got %s\n", lexem_to_a(top/2), lexem_to_a(lexem.type));
 				exit(1);
 			}
 		}else{
@@ -160,14 +161,14 @@ Parsing_tree_node *parse(FILE *file)
 			}
 			if(success)
 				continue;
-			printf("Unexpected lexem%d\n", lexem.type);
+			printf("Unexpected %s\n", lexem_to_a(lexem.type));
 			exit(1);
 		}
 	}
 		
 	if(lexem.type != EOF_LEXEM)
 	{
-		printf("Expected EOF, got lexem%d\n", lexem.type);
+		printf("Expected EOF, got %s\n", lexem_to_a(lexem.type));
 		exit(1);
 	}
 

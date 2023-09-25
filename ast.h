@@ -16,7 +16,8 @@ typedef enum{
 	AST_READ,
 	AST_WRITE,
 	AST_WRITE_CR,
-	AST_BRANCH
+	AST_BRANCH,
+	AST_NOP
 } Ast_node_type;
 
 typedef struct Ast_node{

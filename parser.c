@@ -137,6 +137,7 @@ Parsing_tree_node *parse(FILE *file)
 					current -> childs[idx] = new_parsing_tree_node(grammar[i].left_part, current);
 					current = current -> childs[idx];
 					stack = pop_symbol_from_stack(stack);
+					stack = push_symbol_to_stack(stack, -1);
 					success = 1;
 					break;
 				}

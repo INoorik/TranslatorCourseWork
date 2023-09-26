@@ -24,6 +24,7 @@ typedef struct Ast_node{
 	Ast_node_type type;
 	int data;
 	struct Ast_node childs[MAX_AST_NODE_CHILDS];
+	struct Ast_node *next;
 } Ast_node;
 
 Ast_node *build_ast(Parsing_tree_node *tree, int *identifiers_cnt);

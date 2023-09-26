@@ -72,6 +72,8 @@ Identifiers_list *extract_identifiers(Parsing_tree_node *node)
 	}
 }
 
+Ast_node *build_expression_ast(Parsing_tree_node *tree, Identifiers_list *identifiers);
+
 Ast_node *build_ast(Parsing_tree_node *tree)
 {
 	if(tree->type != PROGRAM)

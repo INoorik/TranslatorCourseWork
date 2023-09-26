@@ -90,7 +90,7 @@ Ast_node *build_ast(Parsing_tree_node *tree)
 
 	current_ast_node->type = AST_NOP;
 	current_parsing_node = tree->childs[6];
-	while(current_parsing_node)
+	while(current_parsing_node->childs_types[0]!=NONE)
 	{
 		Lexem *first_lexem = current_parsing_node->childs[0];
 		int is_write = 0;
@@ -106,47 +106,52 @@ Ast_node *build_ast(Parsing_tree_node *tree)
 					exit(2);
 				}
 				new_node -> data = ident_idx;
-				new_node -> childs[0] = build_expression_ast(current_parsint_tree->childs[2], identifiers);
-				if(current_parsint_node->childs_types[4]==NON_TERMINAL)
-					current_parsing_node = current_parsing_node->childs[4];
-				else 
-					current_parsing_node = NULL;
+				new_node -> childs[0] = build_expression_ast(current_parsing_tree->childs[2], identifiers);
+				current_parsing_node = current_parsing_node->childs[4];
 				current_ast_node -> next = new_node;
 				current_ast_node =  new_node;
 			break;
 			case WRITE:
-			is_write = 1;
+				is_write = 1;
 			case READ:	
-			node = current_parsing_node -> childs[2];
-			while(1)	
-			{
-				Lexem *identifier_lexem = node->childs[0];
-				const char *identifier_name = identifier_lexem->idenntifier_name;
-				int ident_idx = identifier_to_int(identifiers, identifier_name);
-				if(ident_idx == -1)
+				node = current_parsing_node -> childs[2];
+				while(1)	
 				{
-					printf("No such identifier: %s\n", identifier_name);
-					exit(2);
+					Lexem *identifier_lexem = node->childs[0];
+					const char *identifier_name = identifier_lexem->idenntifier_name;
+					int ident_idx = identifier_to_int(identifiers, identifier_name);
+					if(ident_idx == -1)
+					{
+						printf("No such identifier: %s\n", identifier_name);
+						exit(2);
+					}
+					Ast_node *new_node = malloc(sizeof(Ast_node));
+					new_node -> type = is_write ? AST_WRITE : AST_READ;
+					new_node -> data = ident_idx;
+					new_node -> childs[0] = current_pasing_node -> childs[2];
+					current_ast_node -> next = new_node;
+					current_ast_node = new_node;
+					if(node->childs[1]->childs_types[0] == NONE)
+						break;
+					node = node->childs[1]->childs[0];
 				}
-				Ast_node *new_node = malloc(sizeof(Ast_node));
-				new_node -> type = is_write ? AST_WRITE : AST_READ;
-				new_node -> data = ident_idx;
-				new_node -> childs[0] = current_pasing_node -> childs[2];
-				current_ast_node -> next = new_node;
-				current_ast_node = new_node;
-				if(node->childs[1]->childs_types[0] == NONE)
-					break;
-				node = node->childs[1]->childs[0];
-			}
-			if(is_write)
-			{
-				Ast_node *new_node = malloc(sizeof(Ast_node));
-				new_node -> type = AST_WRITE_CR;
-				current_ast_node -> next = new_node;
-				current_ast_node = new_node;
-			}
+				if(is_write)
+				{
+					Ast_node *new_node = malloc(sizeof(Ast_node));
+					new_node -> type = AST_WRITE_CR;
+					current_ast_node -> next = new_node;
+					current_ast_node = new_node;
+				}
+				current_parsing_node = current_parsing_node->childs[5];
 			break;
 			case IF:
+				Ast_node *new_node = malloc(sizeof(Ast_node));
+				new_node->type = AST_BRANCH;
+				new_node->childs[0] = build_expression_ast(current_parsing_node->childs[1], identifiers);
+				new_node->childs[1] = build_ast(current_parsing_node->childs[3]);
+				new_node->childs[2] = build_ast(current_parsing_node->childs[5]);
+				current_ast_node -> next = new_node;
+				current_ast_node = new_node;
 			break;
 		}
 	}

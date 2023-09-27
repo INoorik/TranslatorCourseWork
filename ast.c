@@ -173,6 +173,101 @@ Ast_node *build_ast(Parsing_tree_node *tree, int *identifiers_count)
 	return result;
 }
 
+int get_term_size(Parsing_tree_node *tree)
+{
+	Lexem *first_lexem = tree->childs[0];
+	switch (first_lexem->type) {
+		case ZERO_CONSTANT:
+		case ONE_CONSTANT:
+		case IDENTIFIER:
+			return 1;
+		case NOT:
+			return 2;
+		case OPEN_BRACKET:
+			return 3;
+	}
+}
+
+Ast_node *build_disjunction_ast(Parsing_tree_node *tree, Identifiers_list *identifiers);
+Ast_node *build_conjunction_ast(Parsing_tree_node *tree, Identifiers_list *identifiers);
+Ast_node *build_term_ast(Parsing_tree_node *tree, Identifiers_list *identifiers);
+
 Ast_node *build_expression_ast(Parsing_tree_node *tree, Identifiers_list *identifiers)
 {
+	Parsing_tree_node *expression_c = tree->childs[get_term_size(tree)+2];
+	if(expression_c->childs_types[0] == NONE)
+	{
+		return build_disjunction_ast(tree, identifiers);
+	}else{
+		Ast_node *result = malloc(sizeof(Ast_node));
+		result -> type = AST_EQU;
+		result -> childs[0] = build_disjunction_ast(tree, identifiers);
+		result -> childs[1] = build_expression_ast(expression_c->childs[1], identifiers);
+		return result;
+	}
+}
+
+Ast_node *build_disjunction_ast(Parsing_tree_node *tree, Identifiers_list *identifiers)
+{
+	Parsing_tree_node *disjunction_c = tree->childs[get_term_size(tree)+1];
+	if(disjunction_c->childs_types[0] == NONE)
+	{
+		return build_conjunction_ast(tree, identifiers);
+	}else{
+		Ast_node *result = malloc(sizeof(Ast_node));
+		result -> type = AST_OR;
+		result -> childs[0] = build_conjunction_ast(tree, identifiers);
+		result -> childs[1] = build_disjunction_ast(disjunction_c->childs[1], identifiers);
+		return result;
+	}
+}
+
+Ast_node *build_conjunction_ast(Parsing_tree_node *tree, Identifiers_list *identifiers)
+{
+	Parsing_tree_node *conjunction_c = tree->childs[get_term_size(tree)];
+	if(conjunction_c->childs_types[0] == NONE)
+	{
+		return build_term_ast(tree, identifiers);
+	}else{
+		Ast_node *result = malloc(sizeof(Ast_node));
+		result -> type = AST_AND;
+		result -> childs[0] = build_term_ast(tree, identifiers);
+		result -> childs[1] = build_conjunction_ast(conjunction_c->childs[1], identifiers);
+		return result;
+	}
+}
+
+Ast_node *build_term_ast(Parsing_tree_node *tree, Identifiers_list *identifiers)
+{
+	Lexem *first_lexem = tree->childs[0];
+	int constant_value = 1;
+	Ast_node *result = malloc(sizeof(Ast_node));
+	int ident_idx;
+	switch (first_lexem->type) {
+		case ZERO_CONSTANT:
+			constant_value = 0;
+		case ONE_CONSTANT:
+			result -> type = AST_CONSTANT;
+			result -> data = constant_value;
+		break;
+		case IDENTIFIER:
+			ident_idx = identifier_to_int(identifiers, first_lexem->identifier_name);
+			if(ident_idx==-1)
+			{
+				printf("No such identifier: %s\n", first_lexem->identifier_name);
+				exit(2);
+			}
+			result -> type = AST_VARIABLE;
+			result -> data = ident_idx;
+		break;
+		case OPEN_BRACKET:
+			free(result);
+			result = build_expression_ast(tree->childs[1], identifiers);
+		break;
+		case NOT:
+			result -> type = AST_NOT;
+			result -> childs[0] = build_expression_ast(tree->childs[1], identifiers);
+		break;
+	}
+	return result;
 }

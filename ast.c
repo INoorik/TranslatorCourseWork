@@ -65,11 +65,12 @@ Identifiers_list *extract_identifiers(Parsing_tree_node *node)
 			printf("Identifier %s was declared twice\n", identifier_name);
 			exit(2);
 		}
-		push_identifiers(list, identifier_name);
+		list = push_identifiers(list, identifier_name);
 		if(((Parsing_tree_node*)(node->childs[1]))->childs_types[0] == NONE)
 			break;
-		node = ((Parsing_tree_node*)(node->childs[1]))->childs[0];
+		node = ((Parsing_tree_node*)(node->childs[1]))->childs[1];
 	}
+	return list;
 }
 
 Ast_node *build_expression_ast(Parsing_tree_node *tree, Identifiers_list *identifiers);
@@ -82,7 +83,7 @@ Ast_node *build_assignments_list_ast(Parsing_tree_node *tree, Identifiers_list *
 	Parsing_tree_node *current_parsing_node = tree;
 
 	current_ast_node->type = AST_NOP;
-	current_parsing_node = tree->childs[6];
+	current_parsing_node = tree;
 	while(current_parsing_node->childs_types[0]!=NONE)
 	{
 		Lexem *first_lexem = current_parsing_node->childs[0];
@@ -97,7 +98,7 @@ Ast_node *build_assignments_list_ast(Parsing_tree_node *tree, Identifiers_list *
 				int ident_idx = identifier_to_int(identifiers, first_lexem -> identifier_name);
 				if(ident_idx == -1)
 				{
-					printf("No such identifier: %s\n", first_lexem->identifier_name);
+					printf("1>No such identifier: %s\n", first_lexem->identifier_name);
 					exit(2);
 				}
 				new_node -> data = ident_idx;
@@ -117,18 +118,18 @@ Ast_node *build_assignments_list_ast(Parsing_tree_node *tree, Identifiers_list *
 					int ident_idx = identifier_to_int(identifiers, identifier_name);
 					if(ident_idx == -1)
 					{
-						printf("No such identifier: %s\n", identifier_name);
+						printf("2>No such identifier: %s\n", identifier_name);
 						exit(2);
 					}
+					
 					Ast_node *new_node = malloc(sizeof(Ast_node));
 					new_node -> type = is_write ? AST_WRITE : AST_READ;
 					new_node -> data = ident_idx;
-					new_node -> childs[0] = current_parsing_node -> childs[2];
 					current_ast_node -> next = new_node;
 					current_ast_node = new_node;
 					if(((Parsing_tree_node*)(node->childs[1]))->childs_types[0] == NONE)
 						break;
-					node = ((Parsing_tree_node*)(node->childs[1]))->childs[0];
+					node = ((Parsing_tree_node*)(node->childs[1]))->childs[1];
 				}
 				if(is_write)
 				{
@@ -147,6 +148,7 @@ Ast_node *build_assignments_list_ast(Parsing_tree_node *tree, Identifiers_list *
 				new_node->childs[2] = build_assignments_list_ast(current_parsing_node->childs[5], identifiers);
 				current_ast_node -> next = new_node;
 				current_ast_node = new_node;
+				current_parsing_node = current_parsing_node->childs[8];
 			break;
 		}
 	}
@@ -167,7 +169,7 @@ Ast_node *build_ast(Parsing_tree_node *tree, int *identifiers_count)
 
 	*identifiers_count = count_identifiers(identifiers);
 
-	Ast_node *result = build_assignments_list_ast(tree, identifiers);
+	Ast_node *result = build_assignments_list_ast(tree->childs[6], identifiers);
 	
 	clear_identifiers_list(identifiers);
 	return result;
@@ -254,7 +256,7 @@ Ast_node *build_term_ast(Parsing_tree_node *tree, Identifiers_list *identifiers)
 			ident_idx = identifier_to_int(identifiers, first_lexem->identifier_name);
 			if(ident_idx==-1)
 			{
-				printf("No such identifier: %s\n", first_lexem->identifier_name);
+				printf("3>No such identifier: %s\n", first_lexem->identifier_name);
 				exit(2);
 			}
 			result -> type = AST_VARIABLE;
@@ -266,7 +268,7 @@ Ast_node *build_term_ast(Parsing_tree_node *tree, Identifiers_list *identifiers)
 		break;
 		case NOT:
 			result -> type = AST_NOT;
-			result -> childs[0] = build_expression_ast(tree->childs[1], identifiers);
+			result -> childs[0] = build_term_ast(tree->childs[1], identifiers);
 		break;
 	}
 	return result;

@@ -98,7 +98,7 @@ Ast_node *build_assignments_list_ast(Parsing_tree_node *tree, Identifiers_list *
 				int ident_idx = identifier_to_int(identifiers, first_lexem -> identifier_name);
 				if(ident_idx == -1)
 				{
-					printf("1>No such identifier: %s\n", first_lexem->identifier_name);
+					printf("No such identifier: %s\n", first_lexem->identifier_name);
 					exit(2);
 				}
 				new_node -> data = ident_idx;
@@ -118,7 +118,7 @@ Ast_node *build_assignments_list_ast(Parsing_tree_node *tree, Identifiers_list *
 					int ident_idx = identifier_to_int(identifiers, identifier_name);
 					if(ident_idx == -1)
 					{
-						printf("2>No such identifier: %s\n", identifier_name);
+						printf("No such identifier: %s\n", identifier_name);
 						exit(2);
 					}
 					
@@ -256,7 +256,7 @@ Ast_node *build_term_ast(Parsing_tree_node *tree, Identifiers_list *identifiers)
 			ident_idx = identifier_to_int(identifiers, first_lexem->identifier_name);
 			if(ident_idx==-1)
 			{
-				printf("3>No such identifier: %s\n", first_lexem->identifier_name);
+				printf("No such identifier: %s\n", first_lexem->identifier_name);
 				exit(2);
 			}
 			result -> type = AST_VARIABLE;

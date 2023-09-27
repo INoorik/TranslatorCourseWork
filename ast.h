@@ -23,7 +23,7 @@ typedef enum{
 typedef struct Ast_node{
 	Ast_node_type type;
 	int data;
-	struct Ast_node childs[MAX_AST_NODE_CHILDS];
+	struct Ast_node *childs[MAX_AST_NODE_CHILDS];
 	struct Ast_node *next;
 } Ast_node;
 

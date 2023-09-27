@@ -50,7 +50,7 @@ int identifier_to_int(Identifiers_list *list, const char *identifier)
 
 Identifiers_list *extract_identifiers(Parsing_tree_node *node)
 {
-	if(tree->type != VARS_LIST)
+	if(node->symbol != VARS_LIST)
 	{
 		printf("extract_identifiers function require vars list parsing tree as a parameter\n");
 		exit(2);
@@ -59,34 +59,27 @@ Identifiers_list *extract_identifiers(Parsing_tree_node *node)
 	while(1)	
 	{
 		Lexem *identifier_lexem = node->childs[0];
-		const char *identifier_name = identifier_lexem->idenntifier_name;
+		const char *identifier_name = identifier_lexem->identifier_name;
 		if(identifier_to_int(list, identifier_name) != -1)
 		{
 			printf("Identifier %s was declared twice\n", identifier_name);
 			exit(2);
 		}
-		push_identifier(list, identifier_name);
-		if(node->childs[1]->childs_types[0] == NONE)
+		push_identifiers(list, identifier_name);
+		if(((Parsing_tree_node*)(node->childs[1]))->childs_types[0] == NONE)
 			break;
-		node = node->childs[1]->childs[0];
+		node = ((Parsing_tree_node*)(node->childs[1]))->childs[0];
 	}
 }
 
 Ast_node *build_expression_ast(Parsing_tree_node *tree, Identifiers_list *identifiers);
 
-Ast_node *build_ast(Parsing_tree_node *tree)
+Ast_node *build_assignments_list_ast(Parsing_tree_node *tree, Identifiers_list *identifiers)
 {
-	if(tree->type != PROGRAM)
-	{
-		printf("buils_ast function require program parsing tree as a parameter\n");
-		return 2;
-	}
-
-	Identifiers_list *identifiers = extract_identifiers(tree->childs[1]);
-
 	Ast_node *result = malloc(sizeof(Ast_node));
 
 	Ast_node *current_ast_node = result;
+	Parsing_tree_node *current_parsing_node = tree;
 
 	current_ast_node->type = AST_NOP;
 	current_parsing_node = tree->childs[6];
@@ -96,8 +89,10 @@ Ast_node *build_ast(Parsing_tree_node *tree)
 		int is_write = 0;
 		switch(first_lexem->type)
 		{
+			Ast_node *new_node;
+			Parsing_tree_node *node;
 			case IDENTIFIER:
-				Ast_node *new_node = malloc(sizeof(Ast_node));
+				new_node = malloc(sizeof(Ast_node));
 				new_node->type = AST_ASSIGNMENT;
 				int ident_idx = identifier_to_int(identifiers, first_lexem -> identifier_name);
 				if(ident_idx == -1)
@@ -106,7 +101,7 @@ Ast_node *build_ast(Parsing_tree_node *tree)
 					exit(2);
 				}
 				new_node -> data = ident_idx;
-				new_node -> childs[0] = build_expression_ast(current_parsing_tree->childs[2], identifiers);
+				new_node -> childs[0] = build_expression_ast(current_parsing_node->childs[2], identifiers);
 				current_parsing_node = current_parsing_node->childs[4];
 				current_ast_node -> next = new_node;
 				current_ast_node =  new_node;
@@ -118,7 +113,7 @@ Ast_node *build_ast(Parsing_tree_node *tree)
 				while(1)	
 				{
 					Lexem *identifier_lexem = node->childs[0];
-					const char *identifier_name = identifier_lexem->idenntifier_name;
+					const char *identifier_name = identifier_lexem->identifier_name;
 					int ident_idx = identifier_to_int(identifiers, identifier_name);
 					if(ident_idx == -1)
 					{
@@ -128,12 +123,12 @@ Ast_node *build_ast(Parsing_tree_node *tree)
 					Ast_node *new_node = malloc(sizeof(Ast_node));
 					new_node -> type = is_write ? AST_WRITE : AST_READ;
 					new_node -> data = ident_idx;
-					new_node -> childs[0] = current_pasing_node -> childs[2];
+					new_node -> childs[0] = current_parsing_node -> childs[2];
 					current_ast_node -> next = new_node;
 					current_ast_node = new_node;
-					if(node->childs[1]->childs_types[0] == NONE)
+					if(((Parsing_tree_node*)(node->childs[1]))->childs_types[0] == NONE)
 						break;
-					node = node->childs[1]->childs[0];
+					node = ((Parsing_tree_node*)(node->childs[1]))->childs[0];
 				}
 				if(is_write)
 				{
@@ -145,17 +140,34 @@ Ast_node *build_ast(Parsing_tree_node *tree)
 				current_parsing_node = current_parsing_node->childs[5];
 			break;
 			case IF:
-				Ast_node *new_node = malloc(sizeof(Ast_node));
+				new_node = malloc(sizeof(Ast_node));
 				new_node->type = AST_BRANCH;
 				new_node->childs[0] = build_expression_ast(current_parsing_node->childs[1], identifiers);
-				new_node->childs[1] = build_ast(current_parsing_node->childs[3]);
-				new_node->childs[2] = build_ast(current_parsing_node->childs[5]);
+				new_node->childs[1] = build_assignments_list_ast(current_parsing_node->childs[3], identifiers);
+				new_node->childs[2] = build_assignments_list_ast(current_parsing_node->childs[5], identifiers);
 				current_ast_node -> next = new_node;
 				current_ast_node = new_node;
 			break;
 		}
 	}
 	current_ast_node->next = NULL;
+
+	return result;
+}
+
+Ast_node *build_ast(Parsing_tree_node *tree, int *identifiers_count)
+{
+	if(tree->symbol != PROGRAM)
+	{
+		printf("buils_ast function require program parsing tree as a parameter\n");
+		exit(2);
+	}
+
+	Identifiers_list *identifiers = extract_identifiers(tree->childs[1]);
+
+	*identifiers_count = count_identifiers(identifiers);
+
+	Ast_node *result = build_assignments_list_ast(tree, identifiers);
 	
 	clear_identifiers_list(identifiers);
 	return result;

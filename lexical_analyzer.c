@@ -34,7 +34,7 @@ void read_lexem(Lexem *lexem, FILE *file)
 	symbol[0] = c;
 	if(!isalpha(c))
 	{
-		printf("Invalid character: %c\n", c);
+		fprintf(stderr, "Invalid character: %c\n", c);
 		exit(1);
 	}
 	int i = 1;
@@ -48,7 +48,7 @@ void read_lexem(Lexem *lexem, FILE *file)
 	symbol[i] = '\0';
 	if(i==MAX_IDENTIFIER_LENGTH)
 	{
-		printf("Too long identifier: %s\n", symbol);
+		fprintf(stderr, "Too long identifier: %s\n", symbol);
 		exit(1);
 	}
 	ungetc(c, file);
@@ -70,7 +70,7 @@ void read_lexem(Lexem *lexem, FILE *file)
 	{
 		if(*ptr == '_')
 		{
-			printf("Invalid character: _\n");
+			fprintf(stderr, "Invalid character: _\n");
 			exit(1);
 		}
 	}

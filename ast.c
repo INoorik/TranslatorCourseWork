@@ -52,7 +52,7 @@ Identifiers_list *extract_identifiers(Parsing_tree_node *node)
 {
 	if(node->symbol != VARS_LIST)
 	{
-		printf("extract_identifiers function require vars list parsing tree as a parameter\n");
+		fprintf(stderr, "extract_identifiers function require vars list parsing tree as a parameter\n");
 		exit(2);
 	}
 	Identifiers_list *list = NULL;
@@ -62,7 +62,7 @@ Identifiers_list *extract_identifiers(Parsing_tree_node *node)
 		const char *identifier_name = identifier_lexem->identifier_name;
 		if(identifier_to_int(list, identifier_name) != -1)
 		{
-			printf("Identifier %s was declared twice\n", identifier_name);
+			fprintf(stderr, "Identifier %s was declared twice\n", identifier_name);
 			exit(2);
 		}
 		list = push_identifiers(list, identifier_name);
@@ -98,7 +98,7 @@ Ast_node *build_assignments_list_ast(Parsing_tree_node *tree, Identifiers_list *
 				int ident_idx = identifier_to_int(identifiers, first_lexem -> identifier_name);
 				if(ident_idx == -1)
 				{
-					printf("No such identifier: %s\n", first_lexem->identifier_name);
+					fprintf(stderr, "No such identifier: %s\n", first_lexem->identifier_name);
 					exit(2);
 				}
 				new_node -> data = ident_idx;
@@ -118,7 +118,7 @@ Ast_node *build_assignments_list_ast(Parsing_tree_node *tree, Identifiers_list *
 					int ident_idx = identifier_to_int(identifiers, identifier_name);
 					if(ident_idx == -1)
 					{
-						printf("No such identifier: %s\n", identifier_name);
+						fprintf(stderr, "No such identifier: %s\n", identifier_name);
 						exit(2);
 					}
 					
@@ -161,7 +161,7 @@ Ast_node *build_ast(Parsing_tree_node *tree, int *identifiers_count)
 {
 	if(tree->symbol != PROGRAM)
 	{
-		printf("buils_ast function require program parsing tree as a parameter\n");
+		fprintf(stderr, "buils_ast function require program parsing tree as a parameter\n");
 		exit(2);
 	}
 
@@ -256,7 +256,7 @@ Ast_node *build_term_ast(Parsing_tree_node *tree, Identifiers_list *identifiers)
 			ident_idx = identifier_to_int(identifiers, first_lexem->identifier_name);
 			if(ident_idx==-1)
 			{
-				printf("No such identifier: %s\n", first_lexem->identifier_name);
+				fprintf(stderr, "No such identifier: %s\n", first_lexem->identifier_name);
 				exit(2);
 			}
 			result -> type = AST_VARIABLE;

@@ -122,7 +122,7 @@ Parsing_tree_node *parse(FILE *file)
 				*(Lexem*)(current -> childs[idx]) = lexem;
 				read_lexem(&lexem, file);
 			}else{
-				printf("Expected %s, got %s\n", lexem_to_a(top/2), lexem_to_a(lexem.type));
+				fprintf(stderr, "Expected %s, got %s\n", lexem_to_a(top/2), lexem_to_a(lexem.type));
 				exit(1);
 			}
 		}else{
@@ -162,14 +162,14 @@ Parsing_tree_node *parse(FILE *file)
 			}
 			if(success)
 				continue;
-			printf("Unexpected %s\n", lexem_to_a(lexem.type));
+			fprintf(stderr, "Unexpected %s\n", lexem_to_a(lexem.type));
 			exit(1);
 		}
 	}
 		
 	if(lexem.type != EOF_LEXEM)
 	{
-		printf("Expected EOF, got %s\n", lexem_to_a(lexem.type));
+		fprintf(stderr, "Expected EOF, got %s\n", lexem_to_a(lexem.type));
 		exit(1);
 	}
 

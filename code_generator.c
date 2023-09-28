@@ -52,7 +52,7 @@ void write_expression(FILE *file, Ast_node *ast)
 		case AST_VARIABLE:
 			byte = (ast->data)/8;
 			bit = (ast->data)%8;
-			fprintf(file, "mov $%d(%%eax), %%al\n", byte);
+			fprintf(file, "mov %d(%%ebx), %%al\n", byte);
 			fprintf(file, "and $%d, %%al\n", 1<<bit);
 		break;
 	}
@@ -72,13 +72,13 @@ void write_assignments_list(FILE *file, Ast_node *ast)
 				assignment_label = get_unique_number();
 				byte = (ast->data)/8;
 				bit = (ast->data)%8;
-				fprintf(file, "mov $%d(%%ebx), %%ah\n", byte);
+				fprintf(file, "mov %d(%%ebx), %%ah\n", byte);
 				fprintf(file, "and $%d, %%ah\n", 0xff ^ (1<<bit));
 				write_expression(file, ast->childs[0]);
 				fprintf(file, "jz label_%d\n", assignment_label);
 				fprintf(file, "or $%d, %%ah\n", 1<<bit);
 				fprintf(file, "label_%d:\n", assignment_label);
-				fprintf(file, "mov %%ah, $%d(%%ebx)\n", byte);
+				fprintf(file, "mov %%ah, %d(%%ebx)\n", byte);
 			break;
 			case AST_READ:
 				is_read = 1;
@@ -101,9 +101,9 @@ void write_assignments_list(FILE *file, Ast_node *ast)
 				fprintf(file, "jz label_%d\n", else_label);
 				write_assignments_list(file, ast->childs[1]);
 				fprintf(file, "jmp label_%d\n", endif_label);
-				fprintf(file, "label_%d\n", else_label);
+				fprintf(file, "label_%d:\n", else_label);
 				write_assignments_list(file, ast->childs[2]);
-				fprintf(file, "label_%d\n", endif_label);
+				fprintf(file, "label_%d:\n", endif_label);
 			break;
 			case AST_NOP:
 			break;

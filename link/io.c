@@ -23,7 +23,10 @@ void read(int ident, char *array)
 	int bit = ident % 8;
 	int value;
 	printf("? ");
-	scanf("%d", &value);
+	if(scanf("%d", &value)==0)
+	{
+		while(getchar()!='\n');
+	}
 	if(value == 0)
 	{
 		array[byte] &= (1 << bit) ^ 0xff;

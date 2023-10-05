@@ -7,7 +7,7 @@ BEGIN
 	FirstBit = A AND B;
 	SecondBit = NOT (A EQU B);
 
-	FirstBit = FirstBit OR SecondBit AND C;
+	FristBit = FirstBit OR SecondBit AND C;
 	SecondBit = NOT(SecondBit EQU C);
 
 	IF FirstBit THEN

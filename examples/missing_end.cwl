@@ -15,4 +15,3 @@ BEGIN
 	ELSE
 		WRITE(SecondBit);
 	END_IF;
-END

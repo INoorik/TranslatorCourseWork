@@ -1,4 +1,4 @@
-VAR A, B, C, FirstBit, SecondBit: LOGICAL;
+VAR A, B, C, FirstBit, B, SecondBit: LOGICAL;
 BEGIN
 	READ(A);
 	READ(B);

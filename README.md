@@ -4,17 +4,20 @@ This program translate language you can see in `examples` directory to assembler
 # Compile compiler
 ```bash
 gcc *.c -o compiler
+cd link
+gcc -c io.c -o io.o -nostdinc -nostdlib -m32 
+cd ../
 ```
 # Compile example program
 ## Translate to assembler
 ```bash
-./compiler ./examples/three_bits_adder.cwl ./three_bits_adder.s
+./compiler ./examples/three_bits_adder.cwl | as -32 -o three_bits_adder.o -I ./include
 ```
-Or, if you want out assembler code to `stdout`
+Or, if you want out assembler code to `three_bits_adder.s`
 ```bash
-./compiler ./examples/three_bits_adder.cwl
+./compiler ./examples/three_bits_adder.cwl ./three_bits_adder.s
 ```
 ## Build program
 ```bash
-gcc ./three_bits_adder.s ./link/io.c -I ./include -m32
+ld ./three_bits_adder.o ./link/io.o -m elf_i386 -o three_bits_adder
 ```
